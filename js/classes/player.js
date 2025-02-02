@@ -6,8 +6,8 @@ export default class Player {
     this.pieces = []
   }
 
-  addPiece(i, j, board) {
-    const piece = new Piece(this.isBlack, i, j, board);
+  addPiece(y, x, board) {
+    const piece = new Piece(this.isBlack, y, x, board);
     this.pieces.push(piece);
     return piece;
   }
