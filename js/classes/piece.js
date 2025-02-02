@@ -6,16 +6,16 @@ export default class Piece {
     downRight: [1, 1]
   }
 
-  constructor(player, x, y, board, king = false) {
+  constructor(player, y, x, board, king = false) {
     this.player = player;
-    this.x = x;
     this.y = y;
+    this.x = x;
     this.board = board;
     this.king = king;
   }
 
   get pos() {
-    return [this.x, this.y]
+    return [this.y, this.x]
   }
 
   findMoves() {
@@ -69,11 +69,11 @@ export default class Piece {
     return board[destination[0]][destination[1]] === null;
   }
 
-  shift(dir, currPos) { // return a new position after shifting the position by diagonals[direction]
+  shift(dir, currPos) { // return a new position after shifting the curr position by diagonals[dir]
     const direction = Piece.diagonals[dir];
-    const newX = currPos[0] + direction[0];
-    const newY = currPos[1] + direction[1];
-    return [newX, newY];
+    const newY = currPos[0] + direction[0];
+    const newX = currPos[1] + direction[1];
+    return [newY, newX];
   }
 
   makeMove() {
