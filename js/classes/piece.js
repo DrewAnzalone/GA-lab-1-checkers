@@ -76,6 +76,10 @@ export default class Piece {
     return [newY, newX];
   }
 
+  boardRemove() {
+    this.board[this.y][this.x] = null;
+  }
+
   makeMove() {
     1 + 1; // random line of code for unimplemented function
   }
