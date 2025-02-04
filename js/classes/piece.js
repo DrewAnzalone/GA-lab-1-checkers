@@ -44,11 +44,13 @@ export default class Piece {
 
   removeInvalidMoves(moves) {
     moves = moves.filter(this.inBounds);
-    const validMoves  =  moves.filter((move) => this.noOverlapPlayerPiece(move, this.board))
-                              .map((move) => move.newPos);
-    const validAttacks = moves.filter((move) => this.validAttack(move, this.board))
-                              .map((move) => move.newPos);;
-    return [validMoves, validAttacks];
+    const output = { moves: [], attacks: [] };
+
+    for (const move of moves) {
+      if (this.noOverlapPlayerPiece(move, this.board)) { output.moves.push(move.newPos); }
+      else if (this.validAttack(move, this.board)) { output.attacks.push(this.shift(move.dir, move.newPos)); }
+    }
+    return output;
   }
 
   inBounds(move) {
