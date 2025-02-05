@@ -6,24 +6,28 @@ import Player from "./classes/player.js";
 const boardElem = document.querySelector("#board");
 boardElem.addEventListener("click", tileOnClick);
 const turnTracker = document.querySelector("#current-turn");
+const resetButton = document.querySelector("#reset");
+resetButton.addEventListener("click", init);
 
-// global consts and lets
+// global lets and consts
 
 let blackTurn = true;
-let gameOver = false;
+let winner = null;
+const dimension = 8;
 const selected = { div: null, id: null };
 const player1 = new Player(blackTurn);
 const player2 = new Player(!blackTurn);
-const board = Array(8).fill().map(() => Array(8).fill(null));
-const divmod8 = (num) => [Math.floor(num / 8), num % 8];
-const toID = (coord) => 8 * coord[0] + coord[1];
+const board = Array(dimension).fill().map(() => Array(dimension).fill(null));
+const divmod8 = (num) => [Math.floor(num / dimension), num % dimension];
+const toID = (coord) => dimension * coord[0] + coord[1];
+const boardManagers = [removeSelectedDestination, renderUpdates, refreshBoard]
 const print = console.log;
 
 // events
 
 function tileOnClick(event) {
-  if (gameOver) return;
-  if (!selected.div) { // no pieces are currently selected
+  if (winner) turnTracker.innerText = `${winner === player1 ? "Black" : "Red"} Wins!`
+  else if (!selected.div) { // no pieces are currently selected
     firstClick(event);
   } else {
     secondClick(event);
@@ -53,11 +57,13 @@ function firstClick(event) {
 }
 
 function secondClick(event) {
-  if (event.target.classList.contains("destination")) {
+  if (event.target.classList.contains("destination")) { // a valid moive has been chosen
     removeSelectedDestination();
     const player = blackTurn ? player1 : player2;
-    player.makeMove(divmod8(id), divmod8(event.target.id));
-  } else {
+    player.makeMove(divmod8(selected.id), divmod8(event.target.id), boardManagers); // boardManagers must be passed in and not called on the next line because of chain attacks
+    winner = getWinner();
+    if (!winner) flipTurn();
+  } else { // the player clicked a blank tile or another piece
     removeSelectedDestination();
     firstClick(event);
   }
@@ -72,24 +78,26 @@ function removeSelectedDestination() {
 }
 
 function init() {
-  setTurnTracker("Black");
+  flipTurn("reset");
   selected.div = null;
   selected.id = null;
   blackTurn = true;
-  gameOver = false;
+  winner = null;
   player1.reset();
   player2.reset();
   resetBoard();
 }
 
-function setTurnTracker(turn) {
-  turnTracker.innerText = `${turn}'s Turn!`;
+function flipTurn(reset = null) {
+  blackTurn = !blackTurn;
+  if (reset) { blackTurn = true; }
+  turnTracker.innerText = `${blackTurn ? "Black" : "Red"}'s Turn!`;
 }
 
 function resetBoard() {
   boardElem.innerHTML = ""; // wipe the board to start from 0 -- easier than trying to relocate existing pieces
 
-  for (let y = 0; y < board.length; y++) {
+  for (let y = 0; y < dimension; y++) {
     for (let x = 0; x < board[y].length; x++) {
       const odd = (y + x) & 1;
 
@@ -143,11 +151,20 @@ function renderUpdates(ids, add, ...classes) {
   }
 }
 
-function main() {
-  init();
-  // gameLoop();
+function refreshBoard() {
+  // print("refresh called")
+  for (const tile of document.querySelectorAll(".tile")) {
+    const coord = divmod8(tile.id)
+    const pieceClasses = board[coord[0]][coord[1]]?.getClassNames() || [];
+    tile.classList.remove("piece", "black", "red", "king")
+    tile.classList.add(...pieceClasses);
+  }
 }
-
 init()
-print(board)
+// player2.reset()
+// for (let row = 0; row < 4; row++) {
+//   board[row].fill(null)
+// }
+refreshBoard()
+// print(board)
 // main();
