@@ -35,28 +35,30 @@ function firstClick(event) {
   const id = event.target.id;
   const [y, x] = divmod8(id);
   const piece = board[y][x];
-  
+
   if (!piece || piece.player !== blackTurn) return; // end if clicked on null or wrong player's piece
-  
+
   const options = piece.findMoves();
   if (!options.moves.length && !options.attacks.length) return; // if no valid moves, end
-  
+
   selected.div = event.target;
   selected.id = id;
   const destinations = [
     ...options.moves.map((move) => toID(move)),
     ...options.attacks.map((move) => toID(move))
   ]; // flattening destination coordinates to div IDs
-  
+
   renderUpdates([id], true, "selected");
   renderUpdates(destinations, true, "destination");
 }
 
 function secondClick(event) {
-  removeSelectedDestination();
   if (event.target.classList.contains("destination")) {
-    // initiate move
+    removeSelectedDestination();
+    const player = blackTurn ? player1 : player2;
+    player.makeMove(divmod8(id), divmod8(event.target.id))
   } else {
+    removeSelectedDestination();
     firstClick(event);
   }
 }
@@ -70,11 +72,18 @@ function removeSelectedDestination() {
 }
 
 function init() {
-  turnTracker.innerText = "Black's Turn!";
+  setTurnTracker("Black")
+  selected.div = null;
+  selected.id = null;
   blackTurn = true;
+  gameOver = false;
   player1.reset();
   player2.reset();
   resetBoard();
+}
+
+function setTurnTracker(turn) {
+  turnTracker.innerText = `${turn}'s Turn!`;
 }
 
 function resetBoard() {
@@ -112,11 +121,15 @@ function placePiece(player, y, x) {
   board[y][x] = player.latestPiece;
 }
 
-function gameOver() {
-  if (!player1.pieces.length || !player2.pieces.length) {
+function getWinner() {
+  if (!player1.pieces.length || !player2.pieces.length) { // either player has no pieces
     return player1.pieces.length ? player1 : player2;
   }
-  return false;
+
+  if (!player1.hasMoves()) return player2;
+  if (!player2.hasMoves()) return player1;
+
+  return null;
 }
 
 function renderUpdates(ids, add, ...classes) {
