@@ -12,6 +12,7 @@ export default class Piece {
     this.x = x;
     this.board = board;
     this.king = king;
+    this.goal = player ? 0 : 7;
   }
 
   get pos() {
@@ -78,15 +79,32 @@ export default class Piece {
     return [newY, newX];
   }
 
+  getClassNames() {
+    const output = ["piece"];
+    output.push(this.player ? "black" : "red")
+    if (this.king) { output.push("king") }
+    return output;
+  }
+
   boardRemove() {
     this.board[this.y][this.x] = null;
   }
 
-  makeMove() {
-    1 + 1; // random line of code for unimplemented function
+  makeMove(destination, refresh) {
+    this.board[destination[0]][destination[1]] = this;
+    this.board[this.y][this.x] = null;
+    this.y = destination[0];
+    this.x = destination[1];
+    if (!this.king) this.checkKing();
+    refresh[2]();
   }
 
-  attackMove() {
-    5 + 5; // random line of code for unimplemented function
+  attackMove(destination, refresh) {
+  }
+
+  checkKing() {
+    if (this.y === this.goal) {
+      this.king = true;
+    }
   }
 }
