@@ -22,6 +22,22 @@ export default class Player {
     this.pieces.splice(idx, 1);
   }
 
+  makeMove(fromCoord, toCoord) {
+    const movingPiece = this.pieces.find(piece =>  fromCoord[0] == piece.y && fromCoord[1] == piece.x );
+    if (Math.abs(fromCoord[0]-toCoord[0]) > 1) { // moving 2 tiles diagonally
+      movingPiece.attackMove(toCoord);
+    } else {
+      movingPiece.move(toCoord);
+    }
+  }
+
+  hasMoves() {
+    return this.pieces.any((piece) => {
+      const options = piece.findMoves();
+      return options.moves || options.attacks
+    })
+  }
+
   reset() {
     this.pieces.length = 0;
   }
