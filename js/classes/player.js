@@ -22,12 +22,12 @@ export default class Player {
     this.pieces.splice(idx, 1);
   }
 
-  makeMove(fromCoord, toCoord) {
+  makeMove(fromCoord, toCoord, boardManagers) {
     const movingPiece = this.pieces.find(piece =>  fromCoord[0] == piece.y && fromCoord[1] == piece.x );
     if (Math.abs(fromCoord[0]-toCoord[0]) > 1) { // moving 2 tiles diagonally
-      movingPiece.attackMove(toCoord);
+      movingPiece.attackMove(toCoord, boardManagers);
     } else {
-      movingPiece.move(toCoord);
+      movingPiece.makeMove(toCoord, boardManagers);
     }
   }
 
