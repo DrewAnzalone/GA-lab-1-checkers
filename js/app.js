@@ -56,7 +56,7 @@ function secondClick(event) {
   if (event.target.classList.contains("destination")) {
     removeSelectedDestination();
     const player = blackTurn ? player1 : player2;
-    player.makeMove(divmod8(id), divmod8(event.target.id))
+    player.makeMove(divmod8(id), divmod8(event.target.id));
   } else {
     removeSelectedDestination();
     firstClick(event);
@@ -72,7 +72,7 @@ function removeSelectedDestination() {
 }
 
 function init() {
-  setTurnTracker("Black")
+  setTurnTracker("Black");
   selected.div = null;
   selected.id = null;
   blackTurn = true;
@@ -103,7 +103,7 @@ function resetBoard() {
       if (!odd || (y > 2 && y < 5)) { // if white tile or middle row
         board[y][x] = null;
       } else {
-        placePiece(y > 3 ? player1 : player2, y, x)
+        placePiece(y > 3 ? player1 : player2, y, x);
         tileDiv.classList.add("piece");
         tileDiv.classList.add(y > 3 ? "black" : "red");
       }
