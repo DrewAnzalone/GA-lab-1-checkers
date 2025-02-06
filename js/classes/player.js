@@ -48,5 +48,4 @@ export default class Player {
   reset() {
     this.pieces.length = 0;
   }
-
 }
