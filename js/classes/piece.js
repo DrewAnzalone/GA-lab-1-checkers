@@ -101,11 +101,11 @@ export default class Piece {
   }
 
   attackMove(destination, enemy) {
-      const enemyY = (this.y+destination[0]) / 2;
-      const enemyX = (this.x+destination[1]) / 2;
-      enemy.removePiece([enemyY, enemyX]);
-      this.makeMove(destination);
-      return this.findMoves().attacks;
+    const enemyY = (this.y + destination[0]) / 2;
+    const enemyX = (this.x + destination[1]) / 2;
+    enemy.removePiece([enemyY, enemyX]);
+    this.makeMove(destination);
+    return this.findMoves().attacks;
   }
 
   checkKing() {

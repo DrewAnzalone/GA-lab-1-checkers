@@ -7,7 +7,7 @@ export default class Player {
   }
 
   get latestPiece() {
-    return this.pieces[this.pieces.length-1];
+    return this.pieces[this.pieces.length - 1];
   }
 
   addPiece(y, x, board) {
@@ -30,8 +30,8 @@ export default class Player {
   }
 
   makeMove(fromCoord, toCoord, enemy) {
-    const movingPiece = this.pieces.find(piece =>  fromCoord[0] == piece.y && fromCoord[1] == piece.x );
-    if (Math.abs(fromCoord[0]-toCoord[0]) > 1) { // moving 2 tiles diagonally
+    const movingPiece = this.pieces.find(piece => fromCoord[0] == piece.y && fromCoord[1] == piece.x);
+    if (Math.abs(fromCoord[0] - toCoord[0]) > 1) { // moving 2 tiles diagonally
       return movingPiece.attackMove(toCoord, enemy);
     } else {
       return movingPiece.makeMove(toCoord);
