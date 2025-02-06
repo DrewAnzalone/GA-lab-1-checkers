@@ -4,7 +4,7 @@ export default class Piece {
     upRight: [-1, 1],
     downLeft: [1, -1],
     downRight: [1, 1]
-  }
+  };
 
   constructor(player, y, x, board, king = false) {
     this.player = player;
@@ -16,7 +16,7 @@ export default class Piece {
   }
 
   get pos() {
-    return [this.y, this.x]
+    return [this.y, this.x];
   }
 
   findMoves() {
@@ -55,7 +55,8 @@ export default class Piece {
   }
 
   inBounds(move) {
-    return move.newPos[0] >= 0 && move.newPos[0] < 8 && move.newPos[1] >= 0 && move.newPos[1] < 8;
+    move = move.newPos || move;
+    return move[0] >= 0 && move[0] < 8 && move[1] >= 0 && move[1] < 8;
   }
 
   noOverlapPlayerPiece(move, board) {
@@ -68,8 +69,7 @@ export default class Piece {
     if (potentialMove === null) { return false; }
     if (potentialMove.player === this.player) { return false; }
 
-    const destination = this.shift(move.dir, move.newPos)
-    destination.newPos = destination; // this is really hacky and smelly but inBounds() assumes a .newPos attr which can be indexed
+    const destination = this.shift(move.dir, move.newPos);
     return this.inBounds(destination) && board[destination[0]][destination[1]] === null;
   }
 
@@ -82,8 +82,8 @@ export default class Piece {
 
   getClassNames() {
     const output = ["piece"];
-    output.push(this.player ? "black" : "red")
-    if (this.king) { output.push("king") }
+    output.push(this.player ? "black" : "red");
+    if (this.king) { output.push("king"); }
     return output;
   }
 

@@ -2,7 +2,6 @@ import Piece from "./classes/piece.js";
 import Player from "./classes/player.js";
 
 // element refs
-
 const boardElem = document.querySelector("#board");
 boardElem.addEventListener("click", tileOnClick);
 const turnTracker = document.querySelector("#current-turn");
@@ -10,24 +9,23 @@ const resetButton = document.querySelector("#reset");
 resetButton.addEventListener("click", init);
 
 // global game object and helper methods
-
-const game = {};
-game.winner = null;
-game.dimension = 8;
-game.blackTurn = true;
-game.chainAttack = false;
-game.selected = { div: null, id: null };
+const game = {
+  winner: null,
+  dimension: 8,
+  blackTurn: true,
+  chainAttack: false,
+  selected: { div: null, id: null }
+};
 game.player1 = new Player(game.blackTurn);
 game.player2 = new Player(!game.blackTurn);
-game.board = Array(game.dimension).fill().map(() => Array(game.dimension).fill(null)); // attrs are defined line by line because some rely on earlier attrs
+game.board = Array(game.dimension).fill().map(() => Array(game.dimension).fill(null)); // some attrs are defined line by line because some rely on earlier attrs
 
 const divmod8 = (num) => [Math.floor(num / game.dimension), num % game.dimension];
 const toID = (coord) => game.dimension * coord[0] + coord[1];
 
 // events
-
 function tileOnClick(event) {
-  if (game.winner) turnTracker.innerText = `${game.winner === game.player1 ? "Black" : "Red"} Wins!`
+  if (game.winner) turnTracker.innerText = `${game.winner === game.player1 ? "Black" : "Red"} Wins!`;
   else if (game.chainAttack) { // chain attacks are foced, so check for valid destination
     if (event.target.classList.contains("destination")) { secondClick(event); }
   } else if (!game.selected.div) { // no pieces are currently selected
@@ -85,7 +83,6 @@ function secondClick(event) {
 }
 
 // functions
-
 function init() {
   game.selected.div = null;
   game.chainAttack = false;
@@ -133,7 +130,7 @@ function flipTurn(reset = null) {
   game.blackTurn = !game.blackTurn;
   if (reset) { game.blackTurn = true; }
   turnTracker.innerText = `${game.blackTurn ? "Black" : "Red"}'s Turn!`;
-  if (game.winner) turnTracker.innerText = `${game.winner === game.player1 ? "Black" : "Red"} Wins!`
+  if (game.winner) turnTracker.innerText = `${game.winner === game.player1 ? "Black" : "Red"} Wins!`;
 }
 
 function getWinner() {
@@ -144,7 +141,6 @@ function getWinner() {
 }
 
 // rendering
-
 function removeSelectedDestination() {
   game.selected.div.classList.remove("selected");
   game.selected.div = null;
@@ -160,11 +156,12 @@ function renderUpdates(ids, ...classes) {
 
 function refreshBoard() {
   for (const tile of document.querySelectorAll(".tile")) {
-    const coord = divmod8(tile.id)
+    const coord = divmod8(tile.id);
     const pieceClasses = game.board[coord[0]][coord[1]]?.getClassNames() || [];
-    tile.classList.remove("piece", "black", "red", "king")
+    tile.classList.remove("piece", "black", "red", "king");
     tile.classList.add(...pieceClasses);
   }
 }
 
+// run game
 init()
