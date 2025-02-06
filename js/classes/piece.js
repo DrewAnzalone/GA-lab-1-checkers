@@ -91,21 +91,20 @@ export default class Piece {
     this.board[this.y][this.x] = null;
   }
 
-  makeMove(destination, refresh) {
+  makeMove(destination) {
     this.board[destination[0]][destination[1]] = this;
     this.board[this.y][this.x] = null;
     this.y = destination[0];
     this.x = destination[1];
     if (!this.king) this.checkKing();
-    refresh();
     return [];
   }
 
-  attackMove(destination, enemy, refresh) {
+  attackMove(destination, enemy) {
       const enemyY = (this.y+destination[0]) / 2;
       const enemyX = (this.x+destination[1]) / 2;
       enemy.removePiece([enemyY, enemyX]);
-      this.makeMove(destination, refresh);
+      this.makeMove(destination);
       return this.findMoves().attacks;
   }
 
