@@ -26,7 +26,7 @@ export default class Piece {
       potentialMoves.push(this.makePotentialMove("upRight"));
       potentialMoves.push(this.makePotentialMove("downLeft"));
       potentialMoves.push(this.makePotentialMove("downRight"));
-    } else if (this.player) { // player is black and not kinged -- moving up 
+    } else if (this.player) { // player is black and not kinged -- moving up
       potentialMoves.push(this.makePotentialMove("upLeft"));
       potentialMoves.push(this.makePotentialMove("upRight"));
     } else { // player is red and not kinged -- moving down
@@ -69,7 +69,8 @@ export default class Piece {
     if (potentialMove.player === this.player) { return false; }
 
     const destination = this.shift(move.dir, move.newPos)
-    return board[destination[0]][destination[1]] === null;
+    destination.newPos = destination; // this is really hacky and smelly but inBounds() assumes a .newPos attr which can be indexed
+    return this.inBounds(destination) && board[destination[0]][destination[1]] === null;
   }
 
   shift(dir, currPos) { // return a new position after shifting the curr position by diagonals[dir]
@@ -96,10 +97,16 @@ export default class Piece {
     this.y = destination[0];
     this.x = destination[1];
     if (!this.king) this.checkKing();
-    refresh[2]();
+    refresh();
+    return [];
   }
 
-  attackMove(destination, refresh) {
+  attackMove(destination, enemy, refresh) {
+      const enemyY = (this.y+destination[0]) / 2;
+      const enemyX = (this.x+destination[1]) / 2;
+      enemy.removePiece([enemyY, enemyX]);
+      this.makeMove(destination, refresh);
+      return this.findMoves().attacks;
   }
 
   checkKing() {

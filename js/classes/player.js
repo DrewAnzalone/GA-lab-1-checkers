@@ -16,26 +16,33 @@ export default class Player {
     return piece;
   }
 
+  getPiece(y, x) {
+    return this.pieces.find(piece => piece.y === y && piece.x === x);
+  }
+
   removePiece(piece) {
+    if (!(piece instanceof Piece)) {
+      piece = this.getPiece(...piece);
+    }
     piece.boardRemove();
     const idx = this.pieces.findIndex(p => p === piece);
     this.pieces.splice(idx, 1);
   }
 
-  makeMove(fromCoord, toCoord, boardManagers) {
+  makeMove(fromCoord, toCoord, enemy, refresh) {
     const movingPiece = this.pieces.find(piece =>  fromCoord[0] == piece.y && fromCoord[1] == piece.x );
     if (Math.abs(fromCoord[0]-toCoord[0]) > 1) { // moving 2 tiles diagonally
-      movingPiece.attackMove(toCoord, boardManagers);
+      return movingPiece.attackMove(toCoord, enemy, refresh);
     } else {
-      movingPiece.makeMove(toCoord, boardManagers);
+      return movingPiece.makeMove(toCoord, refresh);
     }
   }
 
   hasMoves() {
-    return this.pieces.any((piece) => {
+    return this.pieces.some((piece) => {
       const options = piece.findMoves();
-      return options.moves || options.attacks
-    })
+      return options.moves.length || options.attacks.length;
+    });
   }
 
   reset() {

@@ -13,6 +13,7 @@ resetButton.addEventListener("click", init);
 
 let blackTurn = true;
 let winner = null;
+let chainAttack = false;
 const dimension = 8;
 const selected = { div: null, id: null };
 const player1 = new Player(blackTurn);
@@ -20,16 +21,17 @@ const player2 = new Player(!blackTurn);
 const board = Array(dimension).fill().map(() => Array(dimension).fill(null));
 const divmod8 = (num) => [Math.floor(num / dimension), num % dimension];
 const toID = (coord) => dimension * coord[0] + coord[1];
-const boardManagers = [removeSelectedDestination, renderUpdates, refreshBoard]
 const print = console.log;
 
 // events
 
 function tileOnClick(event) {
   if (winner) turnTracker.innerText = `${winner === player1 ? "Black" : "Red"} Wins!`
-  else if (!selected.div) { // no pieces are currently selected
+  else if (chainAttack) { // chain attacks are foced, so check for valid destination
+    if (event.target.classList.contains("destination")) { secondClick(event); }
+  } else if (!selected.div) { // no pieces are currently selected
     firstClick(event);
-  } else {
+  } else { // a piece is selected
     secondClick(event);
   }
 }
@@ -43,7 +45,7 @@ function firstClick(event) {
   if (!piece || piece.player !== blackTurn) return; // end if clicked on null or wrong player's piece
 
   const options = piece.findMoves();
-  if (!options.moves.length && !options.attacks.length) return; // if no valid moves, end
+  if (!(options.moves.length || options.attacks.length)) return; // if no valid moves, end
 
   selected.div = event.target;
   selected.id = id;
@@ -52,17 +54,28 @@ function firstClick(event) {
     ...options.attacks.map((move) => toID(move))
   ]; // flattening destination coordinates to div IDs
 
-  renderUpdates([id], true, "selected");
-  renderUpdates(destinations, true, "destination");
+  renderUpdates([id], "selected");
+  renderUpdates(destinations, "destination");
 }
 
 function secondClick(event) {
-  if (event.target.classList.contains("destination")) { // a valid moive has been chosen
+  if (event.target.classList.contains("destination")) { // a valid move has been chosen
     removeSelectedDestination();
     const player = blackTurn ? player1 : player2;
-    player.makeMove(divmod8(selected.id), divmod8(event.target.id), boardManagers); // boardManagers must be passed in and not called on the next line because of chain attacks
+    const enemy = blackTurn ? player2 : player1;
+    const chainAttacks = player.makeMove(divmod8(selected.id), divmod8(event.target.id), enemy, refreshBoard); // refreshBoard must be passed in and not called on the next line because of chain attacks
+    if (chainAttacks.length) {
+      chainAttack = true;
+      renderUpdates([event.target.id], "selected");
+      renderUpdates(chainAttacks.map(move => toID(move)), "destination");
+      selected.div = event.target;
+      selected.id = event.target.id;
+      return;
+    }
+    chainAttack = false;
     winner = getWinner();
-    if (!winner) flipTurn();
+    if (winner) turnTracker.innerText = `${winner === player1 ? "Black" : "Red"} Wins!`;
+    else flipTurn();
   } else { // the player clicked a blank tile or another piece
     removeSelectedDestination();
     firstClick(event);
@@ -78,20 +91,22 @@ function removeSelectedDestination() {
 }
 
 function init() {
-  flipTurn("reset");
   selected.div = null;
   selected.id = null;
+  chainAttack = false;
   blackTurn = true;
   winner = null;
   player1.reset();
   player2.reset();
   resetBoard();
+  flipTurn("reset");
 }
 
 function flipTurn(reset = null) {
   blackTurn = !blackTurn;
   if (reset) { blackTurn = true; }
   turnTracker.innerText = `${blackTurn ? "Black" : "Red"}'s Turn!`;
+  if (winner) turnTracker.innerText = `${winner === player1 ? "Black" : "Red"} Wins!`
 }
 
 function resetBoard() {
@@ -103,7 +118,7 @@ function resetBoard() {
 
       // create tile and coloring
       const tileDiv = document.createElement("div");
-      tileDiv.id = 8 * y + x;
+      tileDiv.id = toID([y, x]);
       tileDiv.classList.add("tile");
       tileDiv.classList.add(odd ? "brown" : "white");
 
@@ -130,24 +145,16 @@ function placePiece(player, y, x) {
 }
 
 function getWinner() {
-  if (!player1.pieces.length || !player2.pieces.length) { // either player has no pieces
-    return player1.pieces.length ? player1 : player2;
-  }
-
-  if (!player1.hasMoves()) return player2;
-  if (!player2.hasMoves()) return player1;
-
+  const player = blackTurn ? player1 : player2;
+  const opponent = blackTurn ? player2 : player1;
+  if (!(opponent.pieces.length && opponent.hasMoves())) return player;
   return null;
 }
 
-function renderUpdates(ids, add, ...classes) {
+function renderUpdates(ids, ...classes) {
   for (const id of ids) {
     const square = document.getElementById(id);
-    if (add) {
-      square.classList.add(...classes);
-    } else {
-      square.classList.remove(...classes);
-    }
+    square.classList.add(...classes);
   }
 }
 
@@ -160,11 +167,17 @@ function refreshBoard() {
     tile.classList.add(...pieceClasses);
   }
 }
+
 init()
-// player2.reset()
-// for (let row = 0; row < 4; row++) {
-//   board[row].fill(null)
-// }
-refreshBoard()
+// player1.removePiece([6, 7])
+// player1.removePiece([5, 6])
+player2.reset()
+for (let row = 0; row < 4; row++) {
+  board[row].fill(null)
+}
 // print(board)
-// main();
+placePiece(player2, 0, 1)
+placePiece(player2, 0, 5)
+placePiece(player2, 0, 7)
+refreshBoard()
+print(board)
