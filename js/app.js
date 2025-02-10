@@ -24,12 +24,12 @@ const divmod8 = (num) => [Math.floor(num / gameAttrs.dimension), num % gameAttrs
 const toID = (coord) => gameAttrs.dimension * coord[0] + coord[1];
 
 // events
-`
-Using default args is potentially risky here if the click event ever passes multiple arguments.
-But, from my research, I couldn't find anything that indicates this is a possibility in plain html/js
-The alternative to achieve this behavior is replacing the function on line 6 with the arrow function:
-(event) => tileOnClick(event, gameAttrs)
-`
+
+//* Using default args is potentially risky here if the click event ever passes multiple arguments.
+//* But, from my research, I couldn't find anything that indicates this is a possibility in plain html/js
+//* The alternative to achieve this behavior is replacing the function on line 6 with the arrow function:
+//* (event) => tileOnClick(event, gameAttrs)
+
 function tileOnClick(event, game = gameAttrs) {
   if (game.winner) turnTracker.innerText = `${game.winner === game.player1 ? "Black" : "Red"} Wins!`;
   else if (game.chainAttack) { // chain attacks are foced, so check for valid destination
