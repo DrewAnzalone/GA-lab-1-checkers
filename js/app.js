@@ -6,7 +6,7 @@ const boardElem = document.querySelector("#board");
 boardElem.addEventListener("click", tileOnClick);
 const turnTracker = document.querySelector("#current-turn");
 const resetButton = document.querySelector("#reset");
-resetButton.addEventListener("click", () => init());
+resetButton.addEventListener("click", init);
 
 // global game object and helper methods
 const gameAttrs = {
@@ -92,7 +92,7 @@ function secondClick(game, event) {
 }
 
 // functions
-function init(game = gameAttrs) {
+function init(event = null, game = gameAttrs) {
   game.selected.div = null;
   game.chainAttack = false;
   game.selected.id = null;
