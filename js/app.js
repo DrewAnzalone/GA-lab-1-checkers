@@ -34,7 +34,8 @@ function tileOnClick(event, game = gameAttrs) {
   if (game.winner) turnTracker.innerText = `${game.winner === game.player1 ? "Black" : "Red"} Wins!`;
   else if (game.chainAttack) { // chain attacks are foced, so check for valid destination
     if (event.target.classList.contains("destination")) { secondClick(game, event); }
-  } else if (!game.selected.div) { // no pieces are currently selected
+  }
+  else if (!game.selected.div) { // no pieces are currently selected
     firstClick(game, event);
   } else { // a piece is selected
     secondClick(game, event);
